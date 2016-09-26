@@ -1,5 +1,6 @@
 function SRGPolygon( vertices ){
-	this.vertices = new Float64Array(vertices);
+	// this.vertices = new Float64Array(vertices);
+	this.vertices = new Uint8Array(vertices);
 }
 
 SRGPolygon.prototype = {
@@ -30,6 +31,5 @@ SRGPolygon.prototype = {
 		}
 		
 		return { x:minX, y:minY, w:maxX-minX, h:maxY-minY };		
-	}
-	
+	},
 }
