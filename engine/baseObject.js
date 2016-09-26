@@ -6,8 +6,6 @@ function SRGBaseObject( x, y, polygon ){
 	};
 	
 	this.polygon = polygon;
-	// this.preTick = () => {};
-	// this.postTick = () => {};
 
 }
 
@@ -35,15 +33,6 @@ SRGBaseObject.prototype = {
 	},
 	
 	tick:function(){
-		// for(var i=0; i<10000; i++)
-			// Math.sqrt(9999999999);
-		
-		// console.log("Object",this.id,"tick");
-		// this.preTick();
-		/*to be filled...*/
-		// this.postTick();
-	},
-	
-	//setpreTick(func){this.preTick=func;}setpostTick(func){this.postTick=func;}
+	}
 	
 }
