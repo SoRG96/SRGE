@@ -12,7 +12,16 @@ SRGObjectWorker.prototype = {
 	get: function( objid ){
 		return this.objectList[objid]||false;
 	},
-	
+	//TODO: So much...
+	/*
+		TODO:
+			sort by z-bufer
+			get objects by mask ("enemy*", "*bullet*")
+			get distance between objects
+			.each() function
+			stacking: .get("enemy").each(destroy)
+			quad tree sorting
+	*/
 	add: function( obj ){
 		if(obj.isSRGBaseObject){
 			var id = this.objectList.push(obj) - 1;

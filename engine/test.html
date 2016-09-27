@@ -25,7 +25,7 @@
 	
 	new SRGEngine( 320, 240, true );
 	SRGE.canvas.attachToDOM();
-	SRGE.engine.setTickRate(1000/30);
+	SRGE.engine.setTickRate(1000/60);
 	SRGE.engine.startRender();
 	
 	new SRGControls(SRGE.canvas.name);
@@ -46,10 +46,10 @@
 		this.pos.y = SRGE.controls.mouse.y;
 	}
 	
-	var square = SRGE.engine.scene.objects.add(new SRGBaseObject( 0, 0, [-100,-100, 100,-100, 100,100, -100,100, -100,-100], mouse ));
+	var square = SRGE.engine.scene.objects.add(new SRGBaseObject( "square", 0, 0, [-100,-100, 100,-100, 100,100, -100,100, -100,-100], mouse ));
 	square.position = {x:100, y:100};
 	
-	var tri = SRGE.engine.scene.objects.add(new SRGBaseObject( 0, 0, [-25,25, 0,-25, 25,25, -25,25] ));
+	var tri = SRGE.engine.scene.objects.add(new SRGBaseObject( "triangle", 0, 0, [-25,25, 0,-25, 25,25, -25,25], control ));
 	tri.position = {x:100, y:100};
 	
 	function scale05( s, c ){c.scale(1/2,true);}
@@ -108,6 +108,36 @@
 		
 		c.buffer = buffer;
 	}
+	function drawAABB( s, c ){
+		var o = s.objects.list;
+		c.style = {fill:"rgba(255,150,0,255)",stroke:"black"};
+		c.context.globalAlpha = 0.3;
+		
+		for(var i in o){
+			var AABB = o[i].polygon.AABB;
+			var ofX = o[i].pos.x;
+			var ofY = o[i].pos.y;
+			
+			c.context.beginPath();
+			c.context.rect( AABB.x+ofX, AABB.y+ofY, AABB.w, AABB.h );
+			c.context.fill();
+			c.context.stroke();
+		}
+		c.context.globalAlpha = 1;
+	}
+	function drawCenters( s, c ){
+		var o = s.objects.list;
+		c.style = {fill:"red"};
+		
+		for(var i in o){
+			var ofX = o[i].pos.x;
+			var ofY = o[i].pos.y;
+			
+			c.context.beginPath();
+			c.context.rect( ofX-1, ofY-1, 2, 2 );
+			c.context.fill();
+		}
+	}
 	
 	SRGE.render.bind("scale05",scale05);
 	SRGE.render.bind("scale2",scale2);
@@ -115,7 +145,10 @@
 	SRGE.render.bind("invert",invert);
 	SRGE.render.bind("test1",test1);
 	SRGE.render.bind("alpha",alpha);
-	//SRGE.render.pipeline = ["scale05","draw","scale2"];
+	SRGE.render.bind("drawAABB",drawAABB, true);
+	SRGE.render.bind("drawCenters",drawCenters, true);
+	SRGE.render.pipeline = ["draw","drawAABB","drawCenters"];
+	//SRGE.render.pipeline = ["scale05","scale05","scale05","draw","scale2","scale2","scale2"];
 	//SRGE.render.pipeline = ["scale05","scale05","draw","test1","scale2","scale2","invert"];
 	//SRGE.render.pipeline = ["draw"];
 	

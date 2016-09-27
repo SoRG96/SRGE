@@ -65,7 +65,8 @@ SRGEngine.prototype = {
 		var ol = this.scene.objects.list
 		for(var o in ol)
 			ol[o].tick();
-			
+		this.checkCollisions();
+		
 		performance.mark("TickEnd");
 		performance.measure("TickTime", "TickStart", "TickEnd");
 		this.metrics.ticks++;
@@ -84,5 +85,29 @@ SRGEngine.prototype = {
 	stopRender: function(){
 		console.info("SRGEngine: render stopped");	
 		window.cancelAnimationFrame(this.animationFrameId); 
-	}
+	},
+	
+	checkCollisions: function(){
+		//Iterate through all objects and check
+		var objects = this.scene.objects.list;
+		for( var i in objects )
+			for( var j in objects ){
+				if( j <= i ) continue;
+				if( this.checkCollisionAABB( objects[i], objects[j] ) && this.checkCollisionSAT( objects[i], objects[j] ) )
+					console.log(objects[i].name,"collided with",objects[j].name);
+			}
+	},
+	checkCollisionAABB: function( obj1, obj2 ){
+		o1 = obj1.polygon.AABBoff( obj1.pos.x, obj1.pos.y );
+		o2 = obj2.polygon.AABBoff( obj2.pos.x, obj2.pos.y );
+		
+		return (o1.x < o2.x + o2.w 
+		&& o1.x + o1.w > o2.x
+		&& o1.y < o2.y + o2.h
+		&& o1.h+o1.y > o2.y);
+	},
+	checkCollisionSAT: function( obj1, obj2 ){
+		return true;
+		//TODO: SAT check
+	},
 }

@@ -35,15 +35,16 @@ SRGRender.prototype = {
 			return false;
 		}
 		
-		canvas.style = {fill:"red",stroke:"black"};
-		canvas.context.beginPath();
+		canvas.style = {fill:"blue",stroke:"black"};
 		
 		var ol = scene.objects.list;
-		for(var o in ol)
+		for(var o in ol){
+			canvas.context.beginPath();
 			this.drawPolygon( ol[o]._polygon, ol[o].pos.x, ol[o].pos.y, canvas );
+			canvas.context.fill();		
+			canvas.context.stroke();		
+		}
 		
-		canvas.context.fill();		
-		canvas.context.stroke();		
 	},
 	
 	drawPolygon:function( polygon, offsetX, offsetY, canvas ){

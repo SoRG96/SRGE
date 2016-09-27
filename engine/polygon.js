@@ -32,4 +32,13 @@ SRGPolygon.prototype = {
 		
 		return { x:minX, y:minY, w:maxX-minX, h:maxY-minY };		
 	},
+	
+	AABBoff: function( offX, offY ){
+		offX = offX||0;
+		offY = offY||0;
+		var AABB = this.AABB;
+		AABB.x += offX;
+		AABB.y += offY;
+		return AABB;
+	}
 }
