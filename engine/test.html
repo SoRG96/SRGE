@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<script>(function(){"use strict";}())</script>
+		<script src="canvas.js"></script>
+		<script src="helpers.js"></script>
+		<script src="render.js"></script>
+		<script src="polygon.js"></script>
+		<script src="map.js"></script>
+		<script src="objectWorker.js"></script>
+		<script src="baseObject.js"></script>
+		<script src="view.js"></script>
+		<script src="scene.js"></script>
+		<script src="controls.js"></script>
+		<script src="engine.js"></script>
+		
+		
+		<style>canvas{box-shadow:0 0 3px 0px red}</style>
+	</head>
+	
+	<body>
+	<script>
+	
+	new SRGEngine( 320, 240, true );
+	SRGE.canvas.attachToDOM();
+	SRGE.engine.setTickRate(1000/30);
+	SRGE.engine.startRender();
+	
+	new SRGControls(SRGE.canvas.name);
+	new SRGHelpers( true );
+	
+	//w:87
+	//a:65
+	//s:83
+	//d:68
+	function control(){
+		if(SRGE.controls.isPressed(87)) this.pos.y-=1;
+		if(SRGE.controls.isPressed(83)) this.pos.y+=1;
+		if(SRGE.controls.isPressed(65)) this.pos.x-=1;
+		if(SRGE.controls.isPressed(68)) this.pos.x+=1;
+	}
+	function mouse(){
+		this.pos.x = SRGE.controls.mouse.x;
+		this.pos.y = SRGE.controls.mouse.y;
+	}
+	
+	var square = SRGE.engine.scene.objects.add(new SRGBaseObject( 0, 0, [-100,-100, 100,-100, 100,100, -100,100, -100,-100], mouse ));
+	square.position = {x:100, y:100};
+	
+	var tri = SRGE.engine.scene.objects.add(new SRGBaseObject( 0, 0, [-25,25, 0,-25, 25,25, -25,25] ));
+	tri.position = {x:100, y:100};
+	
+	function scale05( s, c ){c.scale(1/2,true);}
+	function scale2( s, c ){c.scale(2,true);}
+	function invert( s, c ){
+		var buffer = c.buffer;
+		for(var i=0; i<buffer.data.length-4; i+=4){
+			buffer.data[i] = 255 - buffer.data[i];
+			buffer.data[i+1] = 255 - buffer.data[i+1];
+			buffer.data[i+2] = 255 - buffer.data[i+2];
+			//buffer.data[i+3] = 255 - buffer.data[i+3];
+		}
+		
+		c.buffer = buffer;
+	}
+	function darken( s, c ){
+		var buffer = c.buffer;
+		
+		for(var i=0; i<buffer.data.length; i+=4){
+			buffer.data[i] /= 2;
+			buffer.data[i+1] /= 2;
+			buffer.data[i+2] /= 2;
+		}
+		
+		c.buffer = buffer;
+	}
+	function test1( s, c ){
+		var buffer = c.buffer;
+		
+		for(var i=0; i<buffer.data.length-12; i+=12){
+			buffer.data[i] -= 25;
+			buffer.data[i+1] -= 25;
+			buffer.data[i+2] -= 25;
+			//buffer.data[i+3] /= 2;
+			
+			
+			
+			buffer.data[i+8] += 25;
+			buffer.data[i+9] += 25;
+			buffer.data[i+10] += 25;
+			//buffer.data[i+11] /= 2;
+		}
+		
+		c.buffer = buffer;
+	}
+	function alpha( s, c ){
+		var buffer = c.buffer;
+		
+		for(var i=0; i<buffer.data.length; i+=4){
+			if(buffer.data[i+3] == 0) continue;
+			//buffer.data[i] = 0;
+			//buffer.data[i+1] = 0;
+			//buffer.data[i+2] = 0;
+			buffer.data[i+3] = 100;
+		}
+		
+		c.buffer = buffer;
+	}
+	
+	SRGE.render.bind("scale05",scale05);
+	SRGE.render.bind("scale2",scale2);
+	SRGE.render.bind("darken",darken);
+	SRGE.render.bind("invert",invert);
+	SRGE.render.bind("test1",test1);
+	SRGE.render.bind("alpha",alpha);
+	//SRGE.render.pipeline = ["scale05","draw","scale2"];
+	//SRGE.render.pipeline = ["scale05","scale05","draw","test1","scale2","scale2","invert"];
+	//SRGE.render.pipeline = ["draw"];
+	
+	
+	
+	/*
+	function test(){
+		
+		var c = new SRGCanvas(500,330,"canvas1");
+		//c.context.translate(c.w/2, c.h/2);
+		c.attachToDOM();
+		
+		//catsImg = new Image();
+		//catsImg.src = "img/cats.png";
+		//c.context.drawImage(catsImg,0,0);
+		
+		for(var x=0;x<=c.w;x+=10){
+			for(var y=0;y<=c.h;y+=10){
+				c.context.rect(x-1,y-1, 2,2);
+			}
+		}
+		
+		c.style = {fill:"black", stroke:"green"};
+		c.context.fill();
+		var p = new SRGPolygon([0,0, 10,0, 10,10, 0,10, 0,0]);
+		
+		var r = new SRGRenderer();
+		c.context.beginPath();
+		
+		performance.mark("_start");
+		r._drawPolygon(p, c);
+		
+		performance.mark("_end");
+		performance.measure('measure_time', '_start', '_end');
+	}
+	
+	function test1(){
+		var iter = 1000;
+		performance.mark("_start");
+		var c = new SRGCanvas(640, 480, "canvas1");
+		c.attachToDOM();
+		var p = new SRGPolygon([0,0, 10,0, 10,10, 0,10, 0,0]);
+			
+		var r = new SRGRenderer();
+		c.context.beginPath();
+		
+		r._drawPolygon(p, c);
+		
+		performance.mark("_end");
+		
+		performance.measure('measure_time', '_start', '_end');
+	}
+	*/
+		
+	</script>
+	</body>
+</html>

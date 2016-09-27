@@ -1,6 +1,6 @@
 function SRGPolygon( vertices ){
 	// this.vertices = new Float64Array(vertices);
-	this.vertices = new Uint8Array(vertices);
+	this.vertices = new Int8Array(vertices);
 }
 
 SRGPolygon.prototype = {

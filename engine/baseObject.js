@@ -1,4 +1,4 @@
-function SRGBaseObject( x, y, polygon ){
+function SRGBaseObject( x, y, polygon, tickFunction ){
 	
 	this.pos = {
 		x:x||0,
@@ -6,7 +6,10 @@ function SRGBaseObject( x, y, polygon ){
 	};
 	
 	this.polygon = polygon;
-
+	if(typeof tickFunction === "function")
+		this.tick = tickFunction;
+	else
+		this.tick = ()=>{};
 }
 
 SRGBaseObject.prototype = {	

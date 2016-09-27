@@ -17,7 +17,7 @@ SRGObjectWorker.prototype = {
 		if(obj.isSRGBaseObject){
 			var id = this.objectList.push(obj) - 1;
 			obj.id = id;
-			return id;
+			return obj;
 		}
 		else
 			console.warn("SRGObjectWorker: wrong object type, expected SRGBaseObject");

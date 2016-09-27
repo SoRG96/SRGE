@@ -1,10 +1,25 @@
-function SRGEngine( w, h ){
+function SRGEngine( w, h, canvas ){
+	if(window.SRGE !== undefined) {
+		throw "SRGEngine: Second instance of SRGEngine are not allowed";
+	}
+	window.SRGE = {};
+	window.SRGE.engine = this;
+	
 	this.scene = new SRGScene();
 	this.render = new SRGRender();
 	this.view = new SRGView( w, h ); //??? Renderer view
+	
+	
+	//Canvas handler
+	if(canvas === true)
+		this.canvas = new SRGCanvas( w, h );
+	else if(canvas.isSRGCanvas) 
+		this.canvas = canvas;
+	
 	this.ticker = {};
+	this.tickRate = 0;
 	this.tickMultiplier = 1;
-	window.SRGEngine.MAIN = this;
+	
 	this.metrics = {
 		frames:0,
 		ticks:0,
@@ -18,13 +33,17 @@ SRGEngine.prototype = {
 	isSRGEngine: true,
 	
 	set canvas( SRGCanvas ){
-		if(SRGCanvas.isSRGCanvas)
+		if(SRGCanvas.isSRGCanvas){
 			this._canvas = SRGCanvas;
-		else
+			window.SRGE.canvas = this._canvas;
+		}else
 			console.warn("SRGEngine: wrong object type, expected SRGCanvas");
 	},
+	get canvas(){
+		return this._canvas;
+	},
 	
-	setTickRate( rate ){
+	setTickRate: function( rate ){
 		rate = parseInt(rate);
 		if(rate >= 0 && rate <= 5000){
 			clearInterval(this.ticker);
@@ -32,10 +51,10 @@ SRGEngine.prototype = {
 			if(rate !== 0)
 				this.ticker = setInterval(function(o){o.tick()}, rate, this);
 			
-			console.info("SRGEngine: tick rate set to", rate);	
+			console.info("SRGEngine: tick rate set to", rate,"ms. (",parseInt(1000/rate),"fps )");	
 			return true;
 		}else{
-			console.warn("SRGEngine: wrong tick rate, must be 0..5000");	
+			console.warn("SRGEngine: wrong tick rate, must be 0..5000 ms.");	
 			return false;
 		}
 	},
@@ -57,10 +76,8 @@ SRGEngine.prototype = {
 		this._startRender();
 	},
 	_startRender: function(){
-		//renderId = Math.random().toString(36).substring(2,25);
-		//window["renderer-"+renderId] = function(){};
-		var engine = window.SRGEngine.MAIN;
-		engine.render.draw(engine.scene, engine._canvas);
+		var engine = SRGE.engine;
+		engine.render.render(engine.scene, engine._canvas);
 		engine.animationFrameId = window.requestAnimationFrame(engine._startRender);	
 		engine.metrics.frames++;	
 	},
