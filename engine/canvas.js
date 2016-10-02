@@ -14,7 +14,6 @@ function SRGCanvas( w, h, name ){
 	this.context.strokeStyle = "red";
 	this.context.fillStyle = "black";
 	
-	this._smoothing = false;
 	this.smoothing = false;
 	
 	this.saveState();

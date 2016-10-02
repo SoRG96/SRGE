@@ -67,7 +67,9 @@ SRGEngine.prototype = {
 		var ol = this.scene.objects.list
 		for(var o in ol)
 			ol[o].tick();
-		this.checkCollisions();
+		this.checkCollisions_1();
+		
+		this.scene.objects.flush();
 		
 		performance.mark("TickEnd");
 		performance.measure("TickTime", "TickStart", "TickEnd");
@@ -96,9 +98,20 @@ SRGEngine.prototype = {
 			for( var j in objects ){
 				if( j <= i ) continue;
 				if( this.checkCollisionAABB( objects[i], objects[j] ) && this.checkCollisionSAT( objects[i], objects[j] ) ){
-					// console.log(objects[i].name,"collided with",objects[j].name);
+					objects[i].hit(objects[j]);
+					objects[j].hit(objects[i]);
 				}
 			}
+	},
+	checkCollisions_1: function(){
+		//Different approach
+		var objects = this.scene.objects.get();
+		for(var i in objects)
+			for(var j in this.scene.objects.get(objects[i].collision))
+				if( i !== j && this.checkCollisionAABB( objects[i], objects[j] ) && this.checkCollisionSAT( objects[i], objects[j] ) ){
+					objects[i].hit(objects[j]);
+					objects[j].hit(objects[i]);
+				}
 	},
 	checkCollisionAABB: function( obj1, obj2 ){
 		o1 = obj1.polygon.getAABBoff( obj1.pos.x, obj1.pos.y );

@@ -1,18 +1,21 @@
-function SRGBaseObject( name, x, y, polygon, tickFunction ){
+function SRGBaseObject( type, x, y, polygon, tickFunction ){
 	
-	this.name = name;
+	this.type = type;
 	this.pos = {
 		x:x||0,
 		y:y||0,
 		z:0
 	};
 	
+	this.style = {fill:"orange",stroke:"black"};
+	this.collision = "*";
+	
 	this.polygon = polygon;
 	if(typeof tickFunction === "function")
 		this.tick = tickFunction;
 }
 
-SRGBaseObject.prototype = {	
+SRGBaseObject.prototype = {
 	constructor: SRGBaseObject,	
 	isSRGBaseObject: true,
 	
@@ -38,10 +41,14 @@ SRGBaseObject.prototype = {
 	},
 	
 	hit:function(by){
-		console.log(by.name)
+		console.log(this.type,this.id,"hit by",by.type);
+		this.destroy();
 	},
 	
 	tick:function(){
-	}
+	},
 	
+	destroy: function(){
+		SRGE.engine.scene.objects.remove(this.id);
+	}
 }
