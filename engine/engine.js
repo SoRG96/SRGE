@@ -24,7 +24,9 @@ function SRGEngine( w, h, canvas ){
 		frames:0,
 		ticks:0,
 		framesS:0,
-		ticksS:0
+		ticksS:0,
+		framesD:0,
+		ticksD:0
 	};
 }
 
@@ -93,13 +95,14 @@ SRGEngine.prototype = {
 		for( var i in objects )
 			for( var j in objects ){
 				if( j <= i ) continue;
-				if( this.checkCollisionAABB( objects[i], objects[j] ) && this.checkCollisionSAT( objects[i], objects[j] ) )
-					console.log(objects[i].name,"collided with",objects[j].name);
+				if( this.checkCollisionAABB( objects[i], objects[j] ) && this.checkCollisionSAT( objects[i], objects[j] ) ){
+					// console.log(objects[i].name,"collided with",objects[j].name);
+				}
 			}
 	},
 	checkCollisionAABB: function( obj1, obj2 ){
-		o1 = obj1.polygon.AABBoff( obj1.pos.x, obj1.pos.y );
-		o2 = obj2.polygon.AABBoff( obj2.pos.x, obj2.pos.y );
+		o1 = obj1.polygon.getAABBoff( obj1.pos.x, obj1.pos.y );
+		o2 = obj2.polygon.getAABBoff( obj2.pos.x, obj2.pos.y );
 		
 		return (o1.x < o2.x + o2.w 
 		&& o1.x + o1.w > o2.x

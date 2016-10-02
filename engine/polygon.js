@@ -1,6 +1,7 @@
 function SRGPolygon( vertices ){
-	// this.vertices = new Float64Array(vertices);
-	this.vertices = new Int8Array(vertices);
+	this.vertices = new Float32Array(vertices);
+	this.changed = true;
+	this.angle = 0;
 }
 
 SRGPolygon.prototype = {
@@ -17,6 +18,7 @@ SRGPolygon.prototype = {
 	},
 	
 	get AABB(){
+		if(!this.changed) return this._AABB;
 		var minX = this.vertices[0];
 		var maxX = this.vertices[0];
 		var minY = this.vertices[1];
@@ -30,15 +32,31 @@ SRGPolygon.prototype = {
 			if(this.vertices[i+1] > maxY) maxY = this.vertices[i+1];			
 		}
 		
-		return { x:minX, y:minY, w:maxX-minX, h:maxY-minY };		
+		this._AABB = { x:minX, y:minY, w:maxX-minX, h:maxY-minY }
+		return this._AABB;		
 	},
 	
-	AABBoff: function( offX, offY ){
+	getAABBoff: function( offX, offY ){
 		offX = offX||0;
 		offY = offY||0;
 		var AABB = this.AABB;
 		AABB.x += offX;
 		AABB.y += offY;
 		return AABB;
+	},
+	
+	rotate: function( angle ){
+		angle = H.normaliseAngle( angle );
+		if( 0 == angle ) return;
+		this.angle += angle;
+		
+		for( var i = 0; i<this.vertices.length; i+=2){
+			var x = this.vertices[i];
+			var y = this.vertices[i+1];
+			this.vertices[i] = x * Math.cos( angle*H.DEG2RAD ) + y * Math.sin( angle*H.DEG2RAD );
+			this.vertices[i+1] = -x * Math.sin( angle*H.DEG2RAD ) + y * Math.cos( angle*H.DEG2RAD );
+		}
+		
+		this.changed = true;
 	}
 }

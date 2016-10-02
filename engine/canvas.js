@@ -14,6 +14,7 @@ function SRGCanvas( w, h, name ){
 	this.context.strokeStyle = "red";
 	this.context.fillStyle = "black";
 	
+	this._smoothing = false;
 	this.smoothing = false;
 	
 	this.saveState();
@@ -31,7 +32,7 @@ SRGCanvas.prototype = {
 	},
 	
 	get smoothing(){
-		return this.context.mozImageSmoothingEnabled||this.context.webkitImageSmoothingEnabled||this.context.msImageSmoothingEnabled||this.context.imageSmoothingEnabled;
+		return this._smoothing;
 	},	
 	set smoothing( param ){
 		param = !!param;
@@ -39,6 +40,7 @@ SRGCanvas.prototype = {
 		this.context.webkitImageSmoothingEnabled = param;
 		this.context.msImageSmoothingEnabled = param;
 		this.context.imageSmoothingEnabled = param;
+		this._smoothing = param;
 	},
 	
 	set style( params ){
@@ -64,10 +66,9 @@ SRGCanvas.prototype = {
 			var tempCanvas = document.createElement("canvas");
 			tempCanvas.width = this.w;
 			tempCanvas.height = this.h;
-			//tempCanvas.getContext("2d").putImageData(this.buffer,0,0);
 			var ctx = tempCanvas.getContext("2d");
 			ctx.putImageData(this.buffer,0,0);
-			ctx.msImageSmoothingEnabled = false;
+			//TODO:disable smoothing
 		}
 		
 		this.w = newW;

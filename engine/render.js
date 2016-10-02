@@ -1,7 +1,8 @@
 function SRGRender(){
 	SRGE.render = this;
-	this._pipeline = ["draw"];
-	this.availableMethods = ["draw"];
+	this._pipeline = ["clear_trail5","draw","drawAABB","drawCenters","drawFPS"];
+	this.availableEffects = ["draw"];
+	this.parseEffects();
 }
 
 SRGRender.prototype = {
@@ -12,12 +13,18 @@ SRGRender.prototype = {
 		performance.mark("FrameDrawStart");
 		
 		this.frame = {};
-		canvas.clear();	
 		for(i=0; i<this._pipeline.length; i++)
-			this[this._pipeline[i]]( scene, canvas );
+			this["e_"+this._pipeline[i]]( scene, canvas );
 		
 		performance.mark("FrameDrawEnd");
 		performance.measure("FrameDrawTime", "FrameDrawStart", "FrameDrawEnd");
+	},
+	
+	parseEffects: function(){
+		for(var n in this)
+			if(n.indexOf("e_") !== -1)
+				this.availableEffects.push(n.substr(2));
+			
 	},
 	
 	set pipeline( param ){
@@ -29,13 +36,8 @@ SRGRender.prototype = {
 		return this._pipeline;
 	},
 	
-	draw: function( scene, canvas ){
-		if(!scene.isSRGScene || !canvas.isSRGCanvas){
-			console.error("SRGRender: WRONG PARAMETERS GIVEN");
-			return false;
-		}
-		
-		canvas.style = {fill:"blue",stroke:"black"};
+	e_draw: function( scene, canvas ){		
+		canvas.style = {fill:"orange",stroke:"black"};
 		
 		var ol = scene.objects.list;
 		for(var o in ol){
@@ -58,8 +60,8 @@ SRGRender.prototype = {
 		if(typeof func === "function" && name!="render"){
 			this[name] = func;
 			
-			if( -1 == this.availableMethods.indexOf("name") )
-				this.availableMethods.push(name);
+			if( -1 == this.availableEffects.indexOf("name") )
+				this.availableEffects.push(name);
 			
 			if( true === attach ) this._pipeline.push(name);
 		}
