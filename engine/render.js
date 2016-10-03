@@ -1,6 +1,7 @@
 function SRGRender(){
 	SRGE.render = this;
-	this._pipeline = ["clear_trail5","draw","drawAABB","drawCenters","drawFPS"];
+	// this._pipeline = ["clear","drawPolygonsOFFOS","drawAABB","drawCenters","drawNumbers","drawFPS"];
+	this._pipeline = ["clear","drawPolygonsOFF","drawAABB"];
 	this.availableEffects = ["draw"];
 	this.parseEffects();
 }
@@ -12,7 +13,6 @@ SRGRender.prototype = {
 	render: function( scene, canvas ){
 		performance.mark("FrameDrawStart");
 		
-		this.frame = {};
 		for(i=0; i<this._pipeline.length; i++)
 			this["e_"+this._pipeline[i]]( scene, canvas );
 		

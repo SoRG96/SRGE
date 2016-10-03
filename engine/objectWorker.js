@@ -53,18 +53,21 @@ SRGObjectWorker.prototype = {
 		this.markedToRemove = [];
 	},
 	
-	getClosestTo: function( obj, mask ){
+	getClosest: function( obj, mask ){
 		var p = obj.position;
 		var closestId = false;
 		var closestDist = Infinity;
 		
-		for(var o in this.objectList){
-			if(this.objectList.id === obj.id) continue;
-			var pp = this.objectList[o].position;
+		var searchO = this.get(mask)
+		
+		for(var o in searchO){			
+			if( searchO[o].id === obj.id ) continue;
+			
+			var pp = searchO[o].position;
 			var dist = Math.sqrt((p.x-pp.x)*(p.x-pp.x) + (p.y-pp.y)*(p.y-pp.y));
 			if(dist < closestDist){
 				closestDist = dist;
-				closestId = o;
+				closestId = searchO[o].id;
 			}
 		}
 		

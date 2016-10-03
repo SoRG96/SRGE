@@ -1,6 +1,6 @@
 function SRGPolygon( vertices ){
 	this.vertices = new Float32Array(vertices);
-	this.changed = true;
+	this.changed = {AABB:true, normals:true};
 	this.angle = 0;
 }
 
@@ -18,7 +18,8 @@ SRGPolygon.prototype = {
 	},
 	
 	get AABB(){
-		if(!this.changed) return this._AABB;
+		if(!this.changed.AABB) return this._AABB;
+		
 		var minX = this.vertices[0];
 		var maxX = this.vertices[0];
 		var minY = this.vertices[1];
@@ -32,17 +33,20 @@ SRGPolygon.prototype = {
 			if(this.vertices[i+1] > maxY) maxY = this.vertices[i+1];			
 		}
 		
-		this._AABB = { x:minX, y:minY, w:maxX-minX, h:maxY-minY }
+		this._AABB = { x:minX, y:minY, w:maxX-minX, h:maxY-minY };
+		this.changed.AABB = false;
 		return this._AABB;		
 	},
 	
 	getAABBoff: function( offX, offY ){
 		offX = offX||0;
 		offY = offY||0;
-		var AABB = this.AABB;
-		AABB.x += offX;
-		AABB.y += offY;
-		return AABB;
+		return { 
+			x: this.AABB.x+offX, 
+			y: this.AABB.y+offY, 
+			w: this.AABB.w,
+			h: this.AABB.h
+		};
 	},
 	
 	rotate: function( angle ){
@@ -57,6 +61,6 @@ SRGPolygon.prototype = {
 			this.vertices[i+1] = -x * Math.sin( angle*H.DEG2RAD ) + y * Math.cos( angle*H.DEG2RAD );
 		}
 		
-		this.changed = true;
+		this.changed = {AABB:true, normals:true};
 	}
 }
