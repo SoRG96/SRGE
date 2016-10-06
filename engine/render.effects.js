@@ -31,9 +31,9 @@ function drawPolygonsSR( s, c ){
 	var o = s.objects.list;
 	c.context.beginPath();
 	
-	c.context.save();
 	
 	for(var i in o){
+		c.context.save();
 		var vertices = o[i]._polygon.vertices;
 		
 		c.context.translate( o[i].pos.x, o[i].pos.y );
@@ -56,9 +56,9 @@ function drawPolygonsSROS( s, c ){
 	c.context.beginPath();
 	
 	c.style = {fill:"orange",stroke:"black"};
-	c.context.save();
 	
 	for(var i in o){
+		c.context.save();
 		var vertices = o[i]._polygon.vertices;
 		
 		c.context.translate( o[i].pos.x, o[i].pos.y );

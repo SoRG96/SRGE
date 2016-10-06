@@ -38,6 +38,28 @@ SRGPolygon.prototype = {
 		return this._AABB;		
 	},
 	
+	//get unique normals
+	get normals(){
+		if(!this.changed.normals) return this._normals;
+		
+		this._normals = [];
+		var normalsT = []; //temp
+		for( var i=0; i<this.vertices.length; i+=2 ){
+			var n = [ this.vertices[i+1], -this.vertices[i] ];
+			//normalising
+			var len = Math.sqrt( n[0]*n[0] + n[1]*n[1] );
+			n = [ n[i]/len, n[i+1]/len ];
+			
+			if(normalsT.indexOf(n[i]+"|"+n[i+1]) == -1){
+				this._normals.concat(n);
+				normalsT.push(n[i]+"|"+n[i+1]);
+			}
+				
+		}
+		this.changed.normals = false;
+		return this._normals;
+	},
+	
 	getAABBoff: function( offX, offY ){
 		offX = offX||0;
 		offY = offY||0;
