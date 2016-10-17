@@ -10,9 +10,11 @@ SRGObjectWorker.prototype = {
 		return this.objectList;
 	},
 	get: function( param ){
-		if("number" == typeof param)
+		if( param == "-" )
+			return [];
+		else if("number" == typeof param)
 			return this.objectList[param];
-		else if("*" == param || undefined == param)
+		else if( "*" == param || undefined == param )
 			return this.objectList;
 		else{
 			var objects = this.objectList.filter(
@@ -32,7 +34,7 @@ SRGObjectWorker.prototype = {
 			+get objects by mask ("enemy*", "*bullet*")
 			get distance between objects
 			.each() function
-			stacking: .get("enemy*").each(destroy)
+			stacking: .get("enemy*").each(destroy) >> use forEach instead
 			quad tree sorting
 	*/
 	add: function( obj ){
@@ -73,5 +75,43 @@ SRGObjectWorker.prototype = {
 		
 		return {id:closestId, dist:closestDist};
 	},
+	
+	getClosestByCoord( x, y, mask ){
+		var closestId = false;
+		var closestDist = Infinity;
+		
+		var searchO = this.get(mask);
+		
+		for(var o in searchO){						
+			var p = searchO[o].position;
+			var dist = Math.sqrt((x-p.x)*(x-p.x) + (y-p.y)*(y-p.y));
+			if(dist < closestDist){
+				closestDist = dist;
+				closestId = searchO[o].id;
+			}
+		}
+		
+		return {id:closestId, dist:closestDist};
+	},
+	
+	getClosestByCoordManhattan( x, y, mask ){
+		var closestId = false;
+		var closestDist = Infinity;
+		
+		var searchO = this.get(mask);
+		
+		for(var o in searchO){						
+			var p = searchO[o].position;
+			var dist = Math.abs( x - p.x ) + Math.abs( y - p.y );
+			
+			if(dist < closestDist){
+				closestDist = dist;
+				closestId = searchO[o].id;
+			}
+		}
+		
+		return {id:closestId, dist:closestDist};
+	},
+	
 	
 }

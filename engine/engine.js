@@ -1,3 +1,5 @@
+//http://www.fundza.com/index.html
+
 function SRGEngine( w, h, canvas ){
 	if(window.SRGE !== undefined) {
 		throw "SRGEngine: Second instance of SRGEngine are not allowed";
@@ -10,6 +12,8 @@ function SRGEngine( w, h, canvas ){
 	this.view = new SRGView( w, h ); //??? Renderer view
 	
 	
+	this.gameLogic = function(){};
+	
 	//Canvas handler
 	if(canvas === true)
 		this.canvas = new SRGCanvas( w, h );
@@ -19,6 +23,7 @@ function SRGEngine( w, h, canvas ){
 	this.ticker = {};
 	this.tickRate = 0;
 	this.tickMultiplier = 1;
+	this.disableCollisionCheck = false;
 	
 	this.metrics = {
 		frames:0,
@@ -61,22 +66,29 @@ SRGEngine.prototype = {
 		}
 	},
 	
-	tick:function(){
+	tick: function(){
 		performance.mark("TickStart");
 		
-		var ol = this.scene.objects.list
-		for(var o in ol)
-			ol[o].tick();
-		this.checkCollisions_1();
-		
-		this.scene.objects.flush();
+		this.logic();
 		
 		performance.mark("TickEnd");
 		performance.measure("TickTime", "TickStart", "TickEnd");
 		this.metrics.ticks++;
 	},
+	logic: function(){		
+		
+		var ol = this.scene.objects.list;
+		for(var o in ol)
+			ol[o].tick();
+		
+		if(!this.disableCollisionCheck)
+			this.checkCollisions_1();
+		
+		this.scene.objects.flush();
+	},
 	
 	startRender: function(){
+		this.stopRender();
 		console.info("SRGEngine: render started");
 		this._startRender();
 	},
@@ -104,14 +116,19 @@ SRGEngine.prototype = {
 			}
 	},
 	checkCollisions_1: function(){
-		//Different approach
+		//Different approach		
 		var objects = this.scene.objects.get();
-		for(var i in objects)
-			for(var j in this.scene.objects.get(objects[i].collision))
-				if( i !== j && this.checkCollisionAABB( objects[i], objects[j] ) && this.checkCollisionSAT( objects[i], objects[j] ) ){
-					objects[i].hit(objects[j]);
-					objects[j].hit(objects[i]);
+		
+		for( var i in objects ){
+			var collision = this.scene.objects.get(objects[i].collision)
+			
+			for( var j in collision ){
+				var id = collision[j].id;
+				if( objects[i].id !== id && this.checkCollisionAABB( objects[i], objects[id] ) && this.checkCollisionSAT( objects[i], objects[id] ) ){
+					objects[i].hit(objects[id]);
 				}
+			}
+		}
 	},
 	checkCollisionAABB: function( obj1, obj2 ){
 		o1 = obj1.polygon.getAABBoff( obj1.pos.x, obj1.pos.y );

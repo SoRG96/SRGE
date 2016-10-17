@@ -72,7 +72,6 @@ SRGPolygon.prototype = {
 	},
 	
 	rotate: function( angle ){
-		angle = H.normaliseAngle( angle );
 		if( 0 == angle ) return;
 		this.angle += angle;
 		

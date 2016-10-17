@@ -1,7 +1,8 @@
 function SRGRender(){
 	SRGE.render = this;
-	// this._pipeline = ["clear","drawPolygonsOFFOS","drawAABB","drawCenters","drawNumbers","drawFPS"];
-	this._pipeline = ["clear","drawPolygonsOFF","drawAABB"];
+	// this._pipeline = ["clear","drawPolygonsOFF","drawAABB","drawCenters","drawNumbers","drawFPS"];
+	// this._pipeline = ["clear","drawPolygonsOFF","drawFPS"];
+	this._pipeline = ["clear","drawPolygonsOFF"];
 	this.availableEffects = ["draw"];
 	this.parseEffects();
 }
@@ -36,6 +37,7 @@ SRGRender.prototype = {
 		return this._pipeline;
 	},
 	
+	//Throwback function
 	e_draw: function( scene, canvas ){		
 		canvas.style = {fill:"orange",stroke:"black"};
 		
@@ -43,10 +45,9 @@ SRGRender.prototype = {
 		for(var o in ol){
 			canvas.context.beginPath();
 			this.drawPolygon( ol[o]._polygon, ol[o].pos.x, ol[o].pos.y, canvas );
-			canvas.context.fill();		
-			canvas.context.stroke();		
+			canvas.context.fill();
+			canvas.context.stroke();
 		}
-		
 	},
 	
 	drawPolygon:function( polygon, offsetX, offsetY, canvas ){

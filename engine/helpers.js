@@ -29,7 +29,28 @@ window.SRGHelpersWindow = {
 	normaliseAngle: function( angleDeg ){
 		angleDeg*=angleDeg<0?-1:1;
 		return (angleDeg % 360);
-	}	
+	},
+	extend: function ( obj1, obj2 ){
+		var newObj = {};
+		
+		for( var i in obj1 )
+			newObj[i] = obj1[i];
+		
+		for( var i in obj2 )
+			newObj[i] = obj2[i];
+		
+		return newObj;
+	},
+	randomRGBAColor: function(){
+		var rand = 0;
+		var color = [
+			Math.floor(Math.random() * 255),
+			Math.floor(Math.random() * 255),
+			Math.floor(Math.random() * 255)
+		];
+		
+		return "rgba(" + color.join(",") + ",1)";
+	},
 }
 
 var H = window.SRGHelpersWindow;

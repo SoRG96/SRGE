@@ -28,11 +28,10 @@ function drawAABB( s, c ){
 //Save|Restore method
 //Should be slow by default
 function drawPolygonsSR( s, c ){
-	var o = s.objects.list;
-	c.context.beginPath();
-	
+	var o = s.objects.list;	
 	
 	for(var i in o){
+		c.context.beginPath();
 		c.context.save();
 		var vertices = o[i]._polygon.vertices;
 		
@@ -76,9 +75,9 @@ function drawPolygonsSROS( s, c ){
 //Must be faster then save|restore
 function drawPolygonsOFF( s, c ){
 	var o = s.objects.list;
-	c.context.beginPath();
 	
 	for(var i in o){
+		c.context.beginPath();
 		var vertices = o[i]._polygon.vertices;
 		var oX = o[i].pos.x;
 		var oY = o[i].pos.y;
@@ -187,6 +186,128 @@ function clear_trail5( s, c ){
 	c.context.fillRect(0, 0, c.w, c.h);
 }
 
+function alpha05( s, c ){
+	c.context.globalAlpha = 0.5;
+}
+function alpha07( s, c ){
+	c.context.globalAlpha = 0.7;
+}
+function alpha1( s, c ){
+	c.context.globalAlpha = 1;
+}
+
+function voronoi( s, c ){
+	var sources = s.objects.get("*");//voronoiSource
+	
+	var width = c.w;
+	var height = c.h;
+	var w = 0, h = 0;
+	var prevStyle = "";
+	
+	for( var x = 0; x<width; x++ )
+		for( var y = 0; y<height; y++ ){
+			//get closest object
+			var closestId = s.objects.getClosestByCoord( x, y, "*").id;
+			
+			if(prevStyle != s.objects.objectList[closestId].color ){
+				c.context.fill();
+				c.context.fillStyle = s.objects.objectList[closestId].color;
+				// console.log(s.objects.objectList[closestId].color); return;
+				c.context.beginPath();
+			}
+			c.context.rect( x, y, 1, 1);
+			prevStyle = s.objects.objectList[closestId].color;
+		}
+	c.context.fill();
+		
+	
+	//Draw sources
+	c.style = { fill: "black" };
+	c.context.beginPath();
+	for(var i in sources){
+		var o = sources[i];
+		var ofX = o.pos.x;
+		var ofY = o.pos.y;
+		
+		c.context.rect( ofX-2, ofY-2, 4, 4 );
+	}
+	c.context.fill();
+}
+
+function voronoiStep10( s, c ){
+	var sources = s.objects.get("*");//voronoiSource
+	
+	var width = c.w;
+	var height = c.h;
+	var w = 0, h = 0;
+	var prevStyle = "";
+	var step = 10;
+	
+	for( var x = parseInt(step/2); x<width; x+=step )
+		for( var y = parseInt(step/2); y<height; y+=step ){
+			//get closest object
+			var closestId = s.objects.getClosestByCoord( x, y, "*").id;
+			
+			if(prevStyle != s.objects.objectList[closestId].color ){
+				c.context.fill();
+				c.context.fillStyle = s.objects.objectList[closestId].color;
+				c.context.beginPath();
+			}
+			c.context.rect( x-parseInt(step/2), y-parseInt(step/2), step, step);
+			prevStyle = s.objects.objectList[closestId].color;
+		}
+	c.context.fill();
+		
+	
+	//Draw sources
+	c.style = { fill: "black" };
+	c.context.beginPath();
+	for(var i in sources){
+		var o = sources[i];
+		var ofX = o.pos.x;
+		var ofY = o.pos.y;
+		
+		c.context.rect( ofX-2, ofY-2, 4, 4 );
+	}
+	c.context.fill();
+}
+
+function voronoiManhattan( s, c ){
+	var sources = s.objects.get("*");
+	
+	var width = c.w;
+	var height = c.h;
+	var w = 0, h = 0;
+	var prevStyle = "";
+	
+	for( var x = 0; x<width; x++ )
+		for( var y = 0; y<height; y++ ){
+			//get closest object
+			var closestId = s.objects.getClosestByCoordManhattan( x, y, "*").id;
+			
+			if(prevStyle != s.objects.objectList[closestId].color ){
+				c.context.fill();
+				c.context.fillStyle = s.objects.objectList[closestId].color;
+				c.context.beginPath();
+			}
+			c.context.rect( x, y, 1, 1);
+			prevStyle = s.objects.objectList[closestId].color;
+		}
+	c.context.fill();
+		
+	
+	//Draw sources
+	c.style = { fill: "black" };
+	c.context.beginPath();
+	for(var i in sources){
+		var o = sources[i];
+		var ofX = o.pos.x;
+		var ofY = o.pos.y;
+		
+		c.context.rect( ofX-2, ofY-2, 4, 4 );
+	}
+	c.context.fill();
+}
 
 //Per pixel manipulation
 //https://hacks.mozilla.org/2011/12/faster-canvas-pixel-manipulation-with-typed-arrays/
@@ -282,6 +403,9 @@ addEffect("scale025", scale025);
 addEffect("clear", clear);
 addEffect("clear_trail5", clear_trail5);
 addEffect("drawFPS", drawFPS);
+addEffect("alpha05", alpha05);
+addEffect("alpha07", alpha07);
+addEffect("alpha1", alpha1);
 
 addEffect("drawPolygonsSR",drawPolygonsSR);
 addEffect("drawPolygonsSROS",drawPolygonsSROS);
@@ -291,3 +415,8 @@ addEffect("drawPolygonsOFFOS",drawPolygonsOFFOS);
 addEffect("dotPattern", dotPattern);
 addEffect("invert", invert);
 addEffect("greyscale", greyscale);
+
+
+addEffect("voronoi", voronoi);
+addEffect("voronoiStep10", voronoiStep10);
+addEffect("voronoiManhattan", voronoiManhattan);

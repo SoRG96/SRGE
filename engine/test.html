@@ -39,11 +39,23 @@
 	<button onclick="SRGE.engine.setTickRate(1000/1)">tickRate(1)</button>
 	<button onclick="SRGE.engine.stopRender()">Stop Render</button>
 	<button onclick="SRGE.engine.startRender()">Start Render</button><br>
+	Voronoi<br>
+	<button onclick="drawVoronoi(10)">Draw(10)</button>
+	<button onclick="drawVoronoi(20)">Draw(20) </button>
+	<button onclick="drawVoronoi(30)">Draw(30) </button>
+	<button onclick="drawVoronoi(50)">Draw(50) </button><br>
+	<button onclick="drawVoronoiManhattan(10)">Manhattan(10)</button>
+	<button onclick="drawVoronoiManhattan(20)">Manhattan(20) </button>
+	<button onclick="drawVoronoiManhattan(30)">Manhattan(30) </button>
+	<button onclick="drawVoronoiManhattan(50)">Manhattan(50) </button><br>
+	<button onclick="drawVoronoiBoth(10)">Both(10) </button>
+	<button onclick="drawVoronoiBoth(25)">Both(25) </button>
+	<button onclick="drawVoronoiBoth(50)">Both(50) </button><br>
 	<script>
-	
+	/*
 	new SRGEngine( 320, 240, true );
 	SRGE.canvas.attachToDOM();
-	SRGE.engine.setTickRate(1000/60);
+	SRGE.engine.setTickRate(1000/58);
 	SRGE.engine.startRender();
 	
 	new SRGControls(SRGE.canvas.name);
@@ -64,15 +76,289 @@
 		this.pos.y = SRGE.controls.mouse.y;
 	}
 	function rotate(){
-		this._polygon.rotate(Math.random()*4);
+		this.rotate(2);
 	}
 	
-	var square = SRGE.engine.scene.objects.add(new SRGBaseObject( "square", 0, 0, [-25,-25, 25,-25, 25,25, -25,25, -25,-25], mouse ));
-	square.position = {x:100, y:100};
+	var square_params = {
+		pos: {
+			x: 100,
+			y: 100
+		},
+		style: {
+			fill:"blue",
+			stroke:"black"
+		},
+		tick: rotate,
+		collision:"tri*",
+		polygon: [ -25,-25, 25,-25, 25,25, -25,25, -25,-25 ]
+	};
 	
-	var tri = SRGE.engine.scene.objects.add(new SRGBaseObject( "triangle", 0, 0, [-25,25, 0,-25*3, 25,25, 0,0, -25,25], rotate ));
-	tri.position = {x:100, y:100};
+	//SRGE.engine.scene.objects.add(new SRGBaseObject( "square", square_params ));
 	
+	var tri_par = {
+		tick: mouse,
+		polygon: [ -25,25, 0,-25, 25,25, 0,0, -25,25 ]
+	}
+	//SRGE.engine.scene.objects.add(new SRGBaseObject( "triangle", tri_par ));
+	*/
+	//
+	
+	
+	
+	
+	
+	
+	//Voronoi test
+	
+	new SRGEngine( 320, 240, true );
+	//new SRGEngine( 800, 600, true );
+	SRGE.canvas.attachToDOM();
+	
+	new SRGControls(SRGE.canvas.name);
+	new SRGHelpers( true );
+	
+	
+	function mouse(){
+		this.pos.x = SRGE.controls.mouse.x;
+		this.pos.y = SRGE.controls.mouse.y;
+	}
+	
+	function drawVoronoi( sources ){
+		SRGE.engine.scene.objects.objectList = [];
+		SRGE.render.pipeline = ["clear","voronoiStep10"];	
+		var voronoi = {
+			pos: {
+				x: 0,
+				y: 0
+			},
+			color:"orange",
+			collision:"-",
+			polygon: [ -1,-1, 1,-1, 1,1, -1,1, -1,-1 ]
+		};
+		
+		for( var i = 0; i<sources; i++ ){
+			SRGE.engine.scene.objects.add(new SRGBaseObject( "voronoiSource", H.extend( voronoi, {
+				pos: {
+					x: Math.random() * SRGE.canvas.w, 
+					y: Math.random() * SRGE.canvas.h
+					},
+				color: H.randomRGBAColor()
+			} ) ));
+		}
+		
+		SRGE.engine.render.render( SRGE.engine.scene,  SRGE.engine._canvas);
+	}
+	
+	function drawVoronoiManhattan( sources ){
+		SRGE.engine.scene.objects.objectList = [];
+		SRGE.render.pipeline = ["clear","voronoiManhattan"];	
+		var voronoi = {
+			pos: {
+				x: 0,
+				y: 0
+			},
+			color:"orange",
+			collision:"-",
+			polygon: [ -1,-1, 1,-1, 1,1, -1,1, -1,-1 ]
+		};
+		
+		for( var i = 0; i<sources; i++ ){
+			SRGE.engine.scene.objects.add(new SRGBaseObject( "voronoiSource", H.extend( voronoi, {
+				pos: {
+					x: Math.random() * SRGE.canvas.w, 
+					y: Math.random() * SRGE.canvas.h
+					},
+				color: H.randomRGBAColor()
+			} ) ));
+		}
+		
+		SRGE.engine.render.render( SRGE.engine.scene,  SRGE.engine._canvas);
+	}
+	
+	function drawVoronoiBoth( sources ){
+		SRGE.engine.scene.objects.objectList = [];
+		SRGE.render.pipeline = ["clear","alpha1","voronoi","alpha07","voronoiManhattan","alpha1"];	
+		var voronoi = {
+			pos: {
+				x: 0,
+				y: 0
+			},
+			color:"orange",
+			collision:"-",
+			polygon: [ -1,-1, 1,-1, 1,1, -1,1, -1,-1 ]
+		};
+		
+		for( var i = 0; i<sources; i++ ){
+			SRGE.engine.scene.objects.add(new SRGBaseObject( "voronoiSource", H.extend( voronoi, {
+				pos: {
+					x: Math.random() * SRGE.canvas.w, 
+					y: Math.random() * SRGE.canvas.h
+					},
+				color: H.randomRGBAColor()
+			} ) ));
+		}
+		
+		SRGE.engine.render.render( SRGE.engine.scene,  SRGE.engine._canvas);
+	}
+	
+	SRGE.engine.setTickRate(1000/1);
+	//SRGE.engine.startRender();
+	
+	//voronoiSource
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	
+	
+	
+	
+	
+	new SRGEngine( 320, 240, true );
+	SRGE.canvas.attachToDOM();
+	
+	new SRGControls(SRGE.canvas.name);
+	new SRGHelpers( true );
+	
+	
+	
+	//PONG GAMETEST
+	var pad_params = {
+		pos:{
+			x: 5,
+			y: SRGE.engine._canvas.h / 2 - 25
+		},
+		collision: "ball*",
+		keys: { //38,40 - arrowup,down
+			up: 87, //w
+			down: 83 //s
+		},
+		height:50,
+		width:10,
+		speed:5,
+		tick: function(){
+			//Moving
+			this.pos.y = SRGE.controls.mouse.y;
+			
+			//if( SRGE.controls.isPressed( this.keys.up ) )
+			//	this.pos.y -= this.speed;
+			//	
+			//if( SRGE.controls.isPressed( this.keys.down ) )
+			//	this.pos.y += this.speed;
+			
+				
+			//Keep in boundaries
+			if( this.pos.y - this.height/2 < 0 )
+				this.pos.y = this.height/2;				
+			if( this.pos.y + this.height/2 > SRGE.engine._canvas.h )
+				this.pos.y = SRGE.engine._canvas.h - this.height/2;
+		},
+		style: {
+			fill:"rgba(0,0,0,1)",
+			stroke:"rgba(0,0,0,0.5)"
+		},
+		polygon: [ -5,-25, 5,-25, 5,25, -5,25, -5,-25 ]
+	}
+	
+	SRGE.engine.scene.objects.add(new SRGBaseObject( "pad", pad_params ));
+	
+	var ball_params = {
+		pos:{
+			x: SRGE.engine._canvas.w / 2,
+			y: SRGE.engine._canvas.h / 2
+		},
+		speed:5,
+		angle:0,
+		collision:"*",
+		polygon: [ -5,-5, -5,5, 5,5, 5,-5, -5,-5 ],
+		style:{
+			fill:"black",
+			stroke:"transparent"
+		},
+		tick: function(){
+			//Supersample movement
+			//Count new position
+			var newX = 0,
+				newY = 0;
+			
+			for( var i = 0; i < this.speed; i++ ){
+				this.move();
+				if( SRGE.engine.checkCollisionAABB() )
+			}
+			
+		},
+		move: function(){
+			this.
+		}
+	}
+	SRGE.engine.scene.objects.add(new SRGBaseObject( "ball", ball_params ));
+	
+	SRGE.engine.disableCollisionCheck = true;
+	
+	
+	SRGE.engine.setTickRate(1000/58);
+	SRGE.engine.startRender();
+	
+	
+	
+	
+	*/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//
+	
+	function test1( iter ){
+		var i = 0,
+			time,
+			perf2, 
+			perf1 = performance.now();
+			
+		for( ; i<iter; i++ ){
+			//SRGE.engine.checkCollisionAABB(SRGE.engine.scene.objects.get(0), SRGE.engine.scene.objects.get(1));
+			SRGE.engine.scene.objects.get("squ*");
+		}
+		
+		perf2 = performance.now();
+		time = perf2-perf1;
+		console.log("TEST1",i,time,"ms. ---",time/i,"ms./i");
+	}
 	</script>
 	
 	</body>
