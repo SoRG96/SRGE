@@ -9,36 +9,109 @@ SRGObjectWorker.prototype = {
 	get list(){
 		return this.objectList;
 	},
-	get: function( objid ){
-		return this.objectList[objid]||false;
+	get: function( param ){
+		if( param == "-" )
+			return [];
+		else if("number" == typeof param)
+			return this.objectList[param];
+		else if( "*" == param || undefined == param )
+			return this.objectList;
+		else{
+			var objects = this.objectList.filter(
+				function( e, i, a ){
+					regExp = new RegExp("^"+param.replace(/\*/g,".*")+"$","gim");
+					return regExp.test(e.type);
+				}, 
+			param);
+			
+			return objects;			
+		}
 	},
-	
+	//TODO: So much...
+	/*
+		TODO:
+			sort by z-bufer
+			+get objects by mask ("enemy*", "*bullet*")
+			get distance between objects
+			.each() function
+			stacking: .get("enemy*").each(destroy) >> use forEach instead
+			quad tree sorting
+	*/
 	add: function( obj ){
 		if(obj.isSRGBaseObject){
 			var id = this.objectList.push(obj) - 1;
 			obj.id = id;
-			return id;
+			return obj;
 		}
 		else
 			console.warn("SRGObjectWorker: wrong object type, expected SRGBaseObject");
 	},
+	remove: function( id ){
+		this.markedToRemove.push(id);		
+	},
+	flush: function(){//Deffered object removal
+		for(var i in this.markedToRemove)
+			delete this.objectList[i];
+		this.markedToRemove = [];
+	},
 	
-	getClosestTo: function( obj ){
+	getClosest: function( obj, mask ){
 		var p = obj.position;
 		var closestId = false;
 		var closestDist = Infinity;
 		
-		for(var o in this.objectList){
-			if(this.objectList.id === obj.id) continue;
-			var pp = this.objectList[o].position;
+		var searchO = this.get(mask)
+		
+		for(var o in searchO){			
+			if( searchO[o].id === obj.id ) continue;
+			
+			var pp = searchO[o].position;
 			var dist = Math.sqrt((p.x-pp.x)*(p.x-pp.x) + (p.y-pp.y)*(p.y-pp.y));
 			if(dist < closestDist){
 				closestDist = dist;
-				closestId = o;
+				closestId = searchO[o].id;
 			}
 		}
 		
 		return {id:closestId, dist:closestDist};
 	},
+	
+	getClosestByCoord( x, y, mask ){
+		var closestId = false;
+		var closestDist = Infinity;
+		
+		var searchO = this.get(mask);
+		
+		for(var o in searchO){						
+			var p = searchO[o].position;
+			var dist = Math.sqrt((x-p.x)*(x-p.x) + (y-p.y)*(y-p.y));
+			if(dist < closestDist){
+				closestDist = dist;
+				closestId = searchO[o].id;
+			}
+		}
+		
+		return {id:closestId, dist:closestDist};
+	},
+	
+	getClosestByCoordManhattan( x, y, mask ){
+		var closestId = false;
+		var closestDist = Infinity;
+		
+		var searchO = this.get(mask);
+		
+		for(var o in searchO){						
+			var p = searchO[o].position;
+			var dist = Math.abs( x - p.x ) + Math.abs( y - p.y );
+			
+			if(dist < closestDist){
+				closestDist = dist;
+				closestId = searchO[o].id;
+			}
+		}
+		
+		return {id:closestId, dist:closestDist};
+	},
+	
 	
 }

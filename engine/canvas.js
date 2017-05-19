@@ -14,9 +14,9 @@ function SRGCanvas( w, h, name ){
 	this.context.strokeStyle = "red";
 	this.context.fillStyle = "black";
 	
-	//this.smoothing = false;
+	this.smoothing = false;
 	
-	//this.saveState();
+	this.saveState();
 }
 
 SRGCanvas.prototype = {
@@ -31,13 +31,15 @@ SRGCanvas.prototype = {
 	},
 	
 	get smoothing(){
-		return this.context.mozImageSmoothingEnabled||this.context.webkitImageSmoothingEnabled||this.context.msImageSmoothingEnabled||this.context.imageSmoothingEnabled;
+		return this._smoothing;
 	},	
 	set smoothing( param ){
+		param = !!param;
 		this.context.mozImageSmoothingEnabled = param;
 		this.context.webkitImageSmoothingEnabled = param;
 		this.context.msImageSmoothingEnabled = param;
 		this.context.imageSmoothingEnabled = param;
+		this._smoothing = param;
 	},
 	
 	set style( params ){
@@ -55,28 +57,34 @@ SRGCanvas.prototype = {
 			document.getElementById(id).appendChild(this.canvas);			
 	},
 	
-	resize:function ( newW, newH ){
+	resize:function ( newW, newH, transfer ){
 		newW = parseInt(newW);
 		newH = parseInt(newH);
 		
-		var tempCanvas = document.createElement("canvas");
-		tempCanvas.width = this.w;
-		tempCanvas.height = this.h;
-		tempCanvas.getContext("2d").putImageData(this.buffer,0,0);
+		if(transfer === true){
+			var tempCanvas = document.createElement("canvas");
+			tempCanvas.width = this.w;
+			tempCanvas.height = this.h;
+			var ctx = tempCanvas.getContext("2d");
+			ctx.putImageData(this.buffer,0,0);
+			//TODO:disable smoothing
+		}
 		
 		this.w = newW;
 		this.h = newH;
 		this.canvas.width = this.w;
 		this.canvas.height = this.h;
 		
-		this.context.drawImage(tempCanvas, 0,0, tempCanvas.width,tempCanvas.height, 0,0, newW,newH);
-		this.scaleWidth *= newW/tempCanvas.width;
-		this.scaleHeight *= newH/tempCanvas.height;
-		this.context.scale(this.scaleWidth, this.scaleHeight);
+		if(transfer === true)
+			this.context.drawImage(tempCanvas, 0,0, tempCanvas.width,tempCanvas.height, 0,0, newW,newH);
 	},
 	
-	scale: function( factor ){
-		this.resize(this.w*factor, this.h*factor);
+	scale: function( factor, transfer ){
+		this.scaleWidth *= (this.w*factor)/this.w;
+		this.scaleHeight *= (this.w*factor)/this.w;
+		
+		this.resize(this.w*factor, this.h*factor, transfer||false);
+		this.context.scale(this.scaleWidth, this.scaleHeight);
 	},
 	
 	saveState:function(){
